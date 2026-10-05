@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "../../../lib/prisma";
-import { ILoginUserPayload, IRegisterPatientPayload } from "./auth.interface"
+import { ILoginUserPayload, IRegisterPatientPayload, IRequestUser } from "./auth.interface"
 import { Role, UserStatus } from "../../../../generated/prisma/enums";
 import { jwtUtils } from "../../utils/jwt";
 import config from "../../../config";
@@ -110,7 +110,28 @@ const loginUser = async (payload: ILoginUserPayload) => {
     }
 }
 
+const getMe = async (payload: IRequestUser) => {
+    const user = await prisma.user.findUnique({
+        where: {
+            id: payload.userId
+        },
+        include: {
+            patient: true
+        },
+        omit: {
+            password: true
+        }
+    })
+
+    if(!user){
+        throw new Error("User not found!")
+    }
+
+    return user;
+}
+
 export const authService = {
     registerPatient,
-    loginUser
+    loginUser,
+    getMe
 }

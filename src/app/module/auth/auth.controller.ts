@@ -64,9 +64,29 @@ const loginUser = catchAsync(async (req: Request, res: Response, next: NextFunct
     })
 })
 
+const getMe = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user;
+
+    if (!user) {
+        throw new Error("User information is missing in the request");
+    }
+
+    const result = await authService.getMe(user)
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "User profile fetched succesfully!",
+        data: {
+            result
+        }
+    })
+})
+
 
 
 export const authController = {
     registerPatient,
-    loginUser
+    loginUser,
+    getMe
 }
