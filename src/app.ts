@@ -7,7 +7,7 @@ import { authRoutes } from "./app/module/auth/auth.routes";
 const app: Application = express();
 
 app.use(cors({
-    origin: config.app_url,
+    origin: config.backend_url,
     credentials: true
 }))
 

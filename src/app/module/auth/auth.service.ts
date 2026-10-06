@@ -4,7 +4,7 @@ import { ILoginUserPayload, IRegisterPatientPayload, IRequestUser } from "./auth
 import { Role, UserStatus } from "../../../../generated/prisma/enums";
 import { jwtUtils } from "../../utils/jwt";
 import config from "../../../config";
-import { SignOptions } from "jsonwebtoken";
+import { JwtPayload, SignOptions } from "jsonwebtoken";
 
 const registerPatient = async (payload: IRegisterPatientPayload) => {
     const { name, password } = payload;
@@ -123,15 +123,52 @@ const getMe = async (payload: IRequestUser) => {
         }
     })
 
-    if(!user){
+    if (!user) {
         throw new Error("User not found!")
     }
 
     return user;
 }
 
+const refreshToken = async (token: string) => {
+    const verifiedRefreshToken = await jwtUtils.verifyToken(token, config.jwt_refresh_secret as string);
+
+    if (!verifiedRefreshToken.success || !verifiedRefreshToken.data) {
+        throw new Error(config.node_env === 'development' ? verifiedRefreshToken.error : "Invalid refresh token")
+    }
+
+    const data = verifiedRefreshToken.data as JwtPayload
+
+    const user = await prisma.user.findUnique({
+        where: {
+            id: data.userId
+        }
+    })
+
+    if (!user || user.isDeleted || user.status !== UserStatus.ACTIVE) {
+        throw new Error("User is inactive or not found")
+    }
+
+    const jwtPayload = {
+        userId: user.id,
+        name: user.name,
+        email: user.name,
+        role: user.role
+    }
+
+    const accessToken = jwtUtils.createToken(jwtPayload, config.jwt_access_secret as string, config.jwt_access_expires_in as SignOptions)
+
+    const refreshToken = jwtUtils.createToken(jwtPayload, config.jwt_refresh_secret as string, config.jwt_refresh_expires_in as SignOptions);
+
+    return {
+        accessToken,
+        refreshToken
+    }
+}
+
 export const authService = {
     registerPatient,
     loginUser,
-    getMe
+    getMe,
+    refreshToken
 }
