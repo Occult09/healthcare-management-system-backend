@@ -3,11 +3,16 @@ import { authController } from "./auth.controller";
 import { auth } from "../../middleware/checkAuth";
 import { Role } from "../../../../generated/prisma/enums";
 
-const router = Router()
+const router = Router();
 
 router.post("/register", authController.registerPatient);
 router.post("/login", authController.loginUser);
-router.get("/me", auth(Role.ADMIN, Role.DOCTOR, Role.PATIENT, Role.SUPER_ADMIN), authController.getMe);
+router.get(
+	"/me",
+	auth(Role.ADMIN, Role.DOCTOR, Role.PATIENT, Role.SUPER_ADMIN),
+	authController.getMe,
+);
 router.post("/refresh-token", authController.refreshToken);
+router.post("/google", authController.googleLogin);
 
 export const authRoutes = router;

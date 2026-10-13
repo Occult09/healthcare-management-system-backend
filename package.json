@@ -8,9 +8,14 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "format:check": "npx biome format ./src",
+    "format:fix": "npx biome format --write ./src",
+    "lint:check": "npx biome lint ./src",
+    "lint:fix": "npx biome lint --write ./src"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.5.15",
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
@@ -29,6 +34,7 @@
     "cors": "^2.8.6",
     "dotenv": "^18.0.5",
     "express": "^5.2.1",
+    "google-auth-library": "^11.2.0",
     "http-status": "^2.1.0",
     "jsonwebtoken": "^9.0.3",
     "pg": "^8.23.1"
