@@ -126,7 +126,6 @@ const refreshToken = catchAsync(
 );
 const googleLogin = catchAsync(
 	async (req: Request, res: Response, next: NextFunction) => {
-
 		const payload = req.body;
 
 		const result = await authService.googleLogin(payload);
@@ -147,13 +146,12 @@ const googleLogin = catchAsync(
 			maxAge: 1000 * 60 * 60 * 24 * 7,
 		});
 
-
 		sendResponse(res, {
 			success: true,
 			statusCode: httpStatus.OK,
 			message: "New tokens generated successfully",
 			data: {
-				result
+				result,
 			},
 		});
 	},
@@ -164,5 +162,5 @@ export const authController = {
 	loginUser,
 	getMe,
 	refreshToken,
-	googleLogin
+	googleLogin,
 };
